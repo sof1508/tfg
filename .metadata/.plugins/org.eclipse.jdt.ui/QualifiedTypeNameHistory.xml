@@ -1,2 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<qualifiedTypeNameHistroy/>
+<qualifiedTypeNameHistroy>
+    <fullyQualifiedTypeName name="picocli.CommandLine"/>
+    <fullyQualifiedTypeName name="picocli.CommandLine.RunAll"/>
+    <fullyQualifiedTypeName name="picocli.CommandLine.Option"/>
+    <fullyQualifiedTypeName name="falsificador.HelloWorldCommand"/>
+    <fullyQualifiedTypeName name="falsificador.FalsificadorCommand"/>
+    <fullyQualifiedTypeName name="picocli.CommandLine.Command"/>
+</qualifiedTypeNameHistroy>
