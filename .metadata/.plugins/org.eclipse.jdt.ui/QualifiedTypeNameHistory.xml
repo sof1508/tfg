@@ -1,9 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <qualifiedTypeNameHistroy>
-    <fullyQualifiedTypeName name="picocli.CommandLine"/>
     <fullyQualifiedTypeName name="picocli.CommandLine.RunAll"/>
     <fullyQualifiedTypeName name="picocli.CommandLine.Option"/>
     <fullyQualifiedTypeName name="falsificador.HelloWorldCommand"/>
     <fullyQualifiedTypeName name="falsificador.FalsificadorCommand"/>
     <fullyQualifiedTypeName name="picocli.CommandLine.Command"/>
+    <fullyQualifiedTypeName name="picocli.CommandLine"/>
+    <fullyQualifiedTypeName name="java.util.concurrent.Callable"/>
+    <fullyQualifiedTypeName name="java.io.IOException"/>
+    <fullyQualifiedTypeName name="java.io.BufferedReader"/>
+    <fullyQualifiedTypeName name="java.io.InputStreamReader"/>
+    <fullyQualifiedTypeName name="logica.FalsificadorApp"/>
+    <fullyQualifiedTypeName name="picocli.CommandLine.Parameters"/>
+    <fullyQualifiedTypeName name="presentacion.MainPresentacion"/>
+    <fullyQualifiedTypeName name="java.io.File"/>
+    <fullyQualifiedTypeName name="logica.IFalsificadorService"/>
+    <fullyQualifiedTypeName name="java.lang.System"/>
+    <fullyQualifiedTypeName name="java.lang.Integer"/>
 </qualifiedTypeNameHistroy>
