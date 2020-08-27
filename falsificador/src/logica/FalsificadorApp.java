@@ -24,7 +24,7 @@ public class FalsificadorApp implements IFalsificadorService {
 
 	@Override
 	public void ejecutarKlee(String archivoKlee) {
-		//klee.ejecutar(archivoCompilado);		
+		klee.ejecutar(archivoKlee);		
 	}
 
 	@Override
