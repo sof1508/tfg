@@ -8,7 +8,9 @@ public interface IFalsificadorService {
 	
 	public boolean compilarKlee(String archivo);
 
-	public void ejecutarKlee(String archivo);
+	public boolean ejecutarKlee(String archivo);
+	
+	public void leerTest();
 	
 	public void leerArchivo(File archivo);
 	

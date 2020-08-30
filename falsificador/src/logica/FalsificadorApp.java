@@ -23,8 +23,14 @@ public class FalsificadorApp implements IFalsificadorService {
 	}
 
 	@Override
-	public void ejecutarKlee(String archivoKlee) {
-		klee.ejecutar(archivoKlee);		
+	public boolean ejecutarKlee(String archivoKlee) {
+		return klee.ejecutar(archivoKlee);		
+	}
+	
+	@Override
+	public void leerTest() {
+		// TODO Esbozo de método generado automáticamente
+		
 	}
 
 	@Override
@@ -37,6 +43,8 @@ public class FalsificadorApp implements IFalsificadorService {
 	public void guardarArchivo(File archivoContrato) {
 		archivo.guardarArchivo(archivoContrato);
 	}
+
+
 	
 
 	

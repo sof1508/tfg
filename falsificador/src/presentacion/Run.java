@@ -30,7 +30,10 @@ public class Run implements Callable<Integer> {
 		servicio = MainPresentacion.crearInstancia();
 		check = servicio.compilarKlee(archivo);
 		if(check == true) {
-			servicio.ejecutarKlee(archivo);
+			check = servicio.ejecutarKlee(archivo);
+			if (check == true) {
+				servicio.leerTest();
+			}
 		}
 		
 		return 0;
