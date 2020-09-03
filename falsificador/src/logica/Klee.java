@@ -1,12 +1,13 @@
 package logica;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Formatter;
-import java.util.Hashtable;
 
 public class Klee {
 	
@@ -76,7 +77,6 @@ public class Klee {
 			
 			int exitVal = process.waitFor();
 			if (exitVal == 0) {
-				System.out.println("Success!");
 				System.out.println("Compilado correctamente");
 				System.out.println(outputExito);
 				return true;
@@ -101,9 +101,7 @@ public class Klee {
 		//klee
 		try {
 			String archivoCompilado = archivo.substring(0, archivo.length()-2);
-			System.out.println(archivoCompilado);
 			archivoCompilado = archivoCompilado + ".bc";
-			System.out.println(archivoCompilado);
 			Process process = Runtime.getRuntime().exec("klee " + archivoCompilado);
 			      			
 			StringBuilder outputExito = new StringBuilder();
@@ -127,7 +125,7 @@ public class Klee {
 
 			int exitVal = process.waitFor();
 			if (exitVal == 0) {
-				System.out.println("Success!");
+				System.out.println("Se ha ejecutado correctamente");
 				System.out.println(outputExito);
 				return true;
 				//System.exit(0);
@@ -149,99 +147,151 @@ public class Klee {
 	}
 			
 	public ArrayList<CasoTest> leerTest() {
-		
 		int numeroTest = 1;
-		int dato;
+		Boolean intVisitado = false;
+		Long dato;
 		String line;
 		String aux;
+		String datoAux;
 		String hexadecimal;
 		String nombre = "Nombre base";
 		CasoTest casoTest;
-		ArrayList<Integer> datos = new ArrayList<Integer>();
+		ArrayList<Long> datos = new ArrayList<Long>();
+		ArrayList<CasoTest> resultados = new ArrayList<CasoTest>();
+		StringBuilder contenidoArchivo = new StringBuilder();
+		StringBuilder outputError;
+		BufferedReader readerExito;
+		BufferedReader readerError; 
 		
 		File archivoTest = new File("klee-last/test"+ formatearNumero(numeroTest) + ".ktest");
-		System.out.println(archivoTest.getName());
 		
-		while(archivoTest.exists()) {
 			try {
-		
-				Process process = Runtime.getRuntime().exec("ktest-tool" + archivoTest);
+				while(archivoTest.exists()) {
+					Process process = Runtime.getRuntime().exec("ktest-tool " + archivoTest);
 			      			
-				StringBuilder outputExito = new StringBuilder();
-				outputExito.append("El test " + numeroTest + "esta constituido por:\n");
-				BufferedReader readerExito = new BufferedReader(
-					new InputStreamReader(process.getInputStream()));
+					//StringBuilder outputExito = new StringBuilder();				
+					contenidoArchivo.append("El test " + numeroTest + " está constituido por:\n");
+					readerExito = new BufferedReader(new InputStreamReader(process.getInputStream()));
 			
-				StringBuilder outputError = new StringBuilder();
-				BufferedReader readerError = new BufferedReader(
-					new InputStreamReader(process.getErrorStream()));
+					outputError = new StringBuilder();
+					readerError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 			
-				while ((line = readerExito.readLine()) != null) {
-					if (line.contains("name")){
-						aux = line.substring(16);
-						aux = aux.replaceAll("'", "");
-						aux = aux.trim();
+					while ((line = readerExito.readLine()) != null) {
+						if (line.contains("name")){
+							aux = line.substring(16);
+							aux = aux.replaceAll("'", "");
+							aux = aux.trim();
+							nombre = aux;
+							intVisitado = false;
+						}  else if (line.contains("hex")) {
+							datos.clear();
+							aux = line.substring(18);
+							aux = aux.trim();
+							for(int i = 0; i < aux.length()/4; i++) {
+								hexadecimal = aux.substring(i*4, (i+1)*4);
+								datoAux = hexadecimalDecimal(hexadecimal);
+								dato = Long.parseLong(datoAux);
+								datos.add(dato);	
+							}
+						} else if (line.contains(": int")) {
+							aux = line.substring(16);
+							dato = Long.parseLong(aux.trim());
+							datos.clear();
+							datos.add(dato);
 						
-						nombre = aux;
-						System.out.println(aux);
-					}	
-						
-					if (line.contains("int")) {
-						aux = line.substring(16);
-						dato = Integer.parseInt(aux.trim());
-						System.out.println(dato);
-						datos.clear();
-						datos.add(dato);
-						
-						outputExito.append("La variable " + nombre + "tiene el valor " + dato + "\n");
-						casoTest = new CasoTest(nombre,datos);
-						
-					} else if (line.contains("hex")) {
-						datos.clear();
-						aux = line.substring(18);
-						aux = aux.trim();
-						
-						for(int i = 0; i < aux.length()/4; i++) {
-							hexadecimal = aux.substring(i*4, (i+1)*4);
-							System.out.println(hexadecimal);
-							dato = hexadecimalDecimal(hexadecimal);
-							System.out.println(dato);
-							datos.add(dato);	
+							contenidoArchivo.append("La variable \"" + nombre + "\" tiene el valor " + dato + "\n");
+							casoTest = new CasoTest(nombre,datos);
+							resultados.add(casoTest);
+							intVisitado = true;
+						} else if (line.contains("text") && intVisitado == false) {
+							contenidoArchivo.append("La variable \"" + nombre + "\" tiene el valor " + Arrays.toString(datos.toArray()) + "\n");						
+							casoTest = new CasoTest(nombre,datos);
+							resultados.add(casoTest);
 						}
-						outputExito.append("La variable " + nombre + "tiene el valor " + Arrays.toString(datos.toArray()));
-						casoTest = new CasoTest(nombre,datos);
-					}										
-				}
+		
+						
+					}
 			
-				while ((line = readerError.readLine()) != null) {
-			
-					outputError.append(line + "\n");
-				}
-			
-
-				int exitVal = process.waitFor();
-				if (exitVal == 0) {
-					System.out.println("Success!");
-					System.out.println(outputExito);
-					System.exit(0);
-				} else {
-				
-					System.out.println("Se ha producido un ERROR a la hora de leer el fichero Ktest");
-					System.out.println(outputError);
-					System.exit(0);
+					while ((line = readerError.readLine()) != null) {
+						outputError.append(line + "\n");
+					}
+					
+					int exitVal = process.waitFor();
+					if (exitVal == 0) {
+						System.out.println("Se ha leido correctamente el caso de prueba " + numeroTest);
+						System.out.println("Guardando resultado en una archivo externo...");
+						
+					
+					} else {
+						System.out.println("Se ha producido un ERROR a la hora de leer el caso de prueba " + numeroTest);
+						System.out.println(outputError);
+					}
+					
+					numeroTest++;
+					archivoTest = new File("klee-last/test"+ formatearNumero(numeroTest) + ".ktest");
 				}
 			
 			} catch (Exception e) {
 				e.printStackTrace();
 			
 			}
-			
-			numeroTest++;
-			archivoTest = new File("klee-last/test"+ formatearNumero(numeroTest) + ".ktest");
-			System.out.println(archivoTest.getName());
+			crearArchivo(contenidoArchivo);
+			return resultados;
 
-		}
-		return null;
+	}
+		
+	public void validarArchivo(File archivo) {
+		int numeroTest = 1;
+		String line;
+		String aux;
+		String datoAux;
+		StringBuilder contenidoArchivo = new StringBuilder();
+		StringBuilder outputError;
+		BufferedReader readerExito;
+		BufferedReader readerError; 
+		
+		File archivoTest = new File("klee-last/test"+ formatearNumero(numeroTest) + ".ktest");
+		
+			try {
+				while(archivoTest.exists()) {
+					Process process = Runtime.getRuntime().exec("export LD_LIBRARY_PATH=/home/sandra/klee/build/lib/:$LD_LIBRARY_PATH\n"
+																+ "gcc -L /home/sandra/klee/build/lib/ " + archivo.getName() + " -lkleeRuntest\n"
+																		+ "KTEST_FILE=" + archivoTest.getName() + " ./a.out");
+					StringBuilder outputExito = new StringBuilder();				
+					readerExito = new BufferedReader(new InputStreamReader(process.getInputStream()));
+			
+					outputError = new StringBuilder();
+					readerError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+			
+					while ((line = readerExito.readLine()) != null) {
+						if (line.contains("KLEE_RUN_TEST_ERROR")){
+							
+					}
+			
+					while ((line = readerError.readLine()) != null) {
+						outputError.append(line + "\n");
+					}
+					
+					int exitVal = process.waitFor();
+					if (exitVal == 0) {
+						System.out.println("Se ha leido correctamente el caso de prueba " + numeroTest);
+						System.out.println("Guardando resultado en una archivo externo...");
+						
+					
+					} else {
+						System.out.println("Se ha producido un ERROR a la hora de leer el caso de prueba " + numeroTest);
+						System.out.println(outputError);
+					}
+					
+					numeroTest++;
+					archivoTest = new File("klee-last/test"+ formatearNumero(numeroTest) + ".ktest");
+				}}
+			}
+			
+			 catch (Exception e) {
+				e.printStackTrace();
+			
+			}
 	}
 
 	public static String formatearNumero(int numero) {
@@ -251,7 +301,8 @@ public class Klee {
 		}
 	}
 	
-	public static int hexadecimalDecimal(String hexadecimal) {
+	public static String hexadecimalDecimal(String hexadecimal) {
+		String resultado = "";
 		String digitos = "0123456789ABCDEF";
 		int decimal = 0;
 		
@@ -262,12 +313,27 @@ public class Klee {
 			decimal = 16*decimal + aux;
 		
 		}
-		
-		return decimal;
+		resultado = resultado + decimal;
+		return resultado;
 	}
 	
-	public static void main(String[] args) {
+	public static void crearArchivo(StringBuilder contenido) {
+		try {
+			File archivo = new File("./casosTest.txt");
+			if(!archivo.exists()) {
+				archivo.createNewFile();
+			}
+			FileWriter fw = new FileWriter(archivo);
+			BufferedWriter bw = new BufferedWriter(fw);
+			
+			bw.write(contenido.toString());
+			bw.close();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
+	
 	
 }
 

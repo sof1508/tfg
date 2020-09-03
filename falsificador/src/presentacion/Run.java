@@ -8,8 +8,8 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 @Command(
-	name = "añadir",
-	description = "añadir archivo"
+	name = "ejecutar",
+	description = "ejecutar archivo"
 )
 public class Run implements Callable<Integer> {
 	IFalsificadorService servicio;
@@ -21,7 +21,7 @@ public class Run implements Callable<Integer> {
         System.exit(exitCode);
 	}
 	
-	@Option(names = {"-r", "--run"}, description = "Ejecutar") 
+	@Option(names = {"-a", "--archivo"}, description = "Ejecutar este archivo") 
 	private String archivo;
 
 	@Override

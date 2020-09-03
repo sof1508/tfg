@@ -5,9 +5,9 @@ import java.util.ArrayList;
 public class CasoTest {
 	
 	String nombre;
-	ArrayList<Integer> valores;
+	ArrayList<Long> valores;
 	
-	public CasoTest(String n, ArrayList<Integer> v) {
+	public CasoTest(String n, ArrayList<Long> v) {
 		this.nombre = n;
 		this.valores = v;
 	}
@@ -16,7 +16,7 @@ public class CasoTest {
 		return this.nombre;
 	}
 
-	public ArrayList<Integer> getValores() {
+	public ArrayList<Long> getValores() {
 		return this.valores;
 	}
 	

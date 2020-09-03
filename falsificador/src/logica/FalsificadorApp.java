@@ -1,6 +1,8 @@
 package logica;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 
 public class FalsificadorApp implements IFalsificadorService {
 	
@@ -28,21 +30,28 @@ public class FalsificadorApp implements IFalsificadorService {
 	}
 	
 	@Override
-	public void leerTest() {
+	public ArrayList<CasoTest> leerTest() {
+		return klee.leerTest();
+		
+	}
+	
+	@Override
+	public void validarArchivo(File archivo) {
 		// TODO Esbozo de método generado automáticamente
 		
 	}
 
 	@Override
-	public void leerArchivo(File archivoContrato) {
-		archivo.leerArchivo(archivoContrato);
+	public StringBuilder leerArchivo(File archivoLeer) throws IOException {
+		return archivo.leerArchivo(archivoLeer);
 		
 	}
-
+	
 	@Override
-	public void guardarArchivo(File archivoContrato) {
-		archivo.guardarArchivo(archivoContrato);
+	public void copiarArchivo(File archivoLeer, File contrato) {
+		archivo.copiarArchivo(archivoLeer,contrato);
 	}
+
 
 
 	

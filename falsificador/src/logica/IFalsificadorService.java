@@ -1,6 +1,8 @@
 package logica;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 
 public interface IFalsificadorService {
 	
@@ -10,10 +12,12 @@ public interface IFalsificadorService {
 
 	public boolean ejecutarKlee(String archivo);
 	
-	public void leerTest();
+	public ArrayList<CasoTest> leerTest();
 	
-	public void leerArchivo(File archivo);
+	public void validarArchivo(File archivo);
 	
-	public void guardarArchivo(File archivo);
+	public StringBuilder leerArchivo(File archivo) throws IOException;
+	
+	public void copiarArchivo(File archivo, File contrato);
 	
 }

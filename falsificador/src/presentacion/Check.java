@@ -9,36 +9,29 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 @Command(
-	name = "añadir",
-	description = "añadir archivo"
+	name = "validar",
+	description = "validar contrato software"
 )
-public class Add implements Callable<Integer> {
+public class Check implements Callable<Integer> {
 	IFalsificadorService servicio;
+	Boolean check;
 	
 	public static void main(String[] args) throws Exception {
 		
-		int exitCode = new CommandLine(new Add()).execute(args);
+		int exitCode = new CommandLine(new Check()).execute(args);
         System.exit(exitCode);
 	}
 	
-	@Option(names = {"-c", "--contrato"}, description = "Añadir contrato")
-	private File contrato;
-	
 	@Option(names = {"-a", "--archivo"}, description = "Añadir archivo C")
-	private File archivo;
+	private File archivo;	
 
 	@Override
 	public Integer call() throws Exception {
 		// LLAMAR LOGICA 
 		servicio = MainPresentacion.crearInstancia();
-		servicio.copiarArchivo(archivo, contrato);
-		System.out.print("Archivos añadidos y nuevo archivo creado correctamente\n");
+		
 		return 0;
 	}
 	
 	
 } 
-	
-
-
-
