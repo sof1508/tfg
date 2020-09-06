@@ -4,10 +4,15 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.util.Scanner;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Formatter;
+
 
 public class Klee {
 	
@@ -245,65 +250,72 @@ public class Klee {
 		String line;
 		String aux;
 		String datoAux;
+		String[] ktestString;
 		StringBuilder contenidoArchivo = new StringBuilder();
 		StringBuilder outputError;
 		BufferedReader readerExito;
 		BufferedReader readerError; 
 		Process process;
+		ProcessBuilder processBuilder = new ProcessBuilder();
 		
 		File archivoTest = new File("klee-last/test"+ formatearNumero(numeroTest) + ".ktest");
+		System.out.println("INICIO");
 		
-			try {
-				while(archivoTest.exists()) {
-					System.out.println("holi1");
-					System.out.println(archivo.getName());
-					System.out.println(archivoTest.getName());
-					if(numeroTest == 1) {
-						//process = Runtime.getRuntime().exec("export LD_LIBRARY_PATH=/home/sandra/klee/build/lib/:$LD_LIBRARY_PATH");
-						System.out.println("primer comando");
-						process = Runtime.getRuntime().exec("gcc -L /home/sandra/klee/build/lib/ " + archivo.getName() + " -lkleeRuntest");
-						System.out.println("segundo comando");
-						System.out.println("KTEST_FILE=klee-last/" + archivoTest.getName() + " ./a.out");
-						process = Runtime.getRuntime().exec("KTEST_FILE=klee-last/" + archivoTest.getName() + " ./a.out");
-						System.out.println("tercer comando");
-						process = Runtime.getRuntime().exec("echo $?");
-					} else {
-						process = Runtime.getRuntime().exec("KTEST_FILE=klee-last/" + archivoTest.getName() + " ./a.out");
-						process = Runtime.getRuntime().exec("echo $?");
-						System.out.println("cuarto comando");
-					}
-					System.out.println("holi2");
-					StringBuilder outputExito = new StringBuilder();				
-					readerExito = new BufferedReader(new InputStreamReader(process.getInputStream()));
-			
-					outputError = new StringBuilder();
-					readerError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-			
-					while ((line = readerExito.readLine()) != null) {
-						if (line.contains("KLEE_RUN_TEST_ERROR")){
+		try {	
+			while(archivoTest.exists()) {
+				String[] command =
+					{
+							"bash",
+					};
+				
+				process= Runtime.getRuntime().exec(command);
+				
+			       new Thread(new SyncPipe(process.getErrorStream(), System.err)).start();
+			       new Thread(new SyncPipe(process.getInputStream(), System.out)).start();
+			       
+			       PrintWriter stdin = new PrintWriter(process.getOutputStream());
+			       
+			    	   stdin.println("gcc -L /home/sandra/klee/build/lib/ " + archivo.getName() + " -lkleeRuntest");
+			    	   stdin.println("KTEST_FILE=klee-last/" + archivoTest.getName() + " ./a.out");
+			    	   stdin.println("echo $?");
+			    	   stdin.close();
+			    	   
+			    	   readerExito = new BufferedReader(new InputStreamReader(process.getInputStream()));
 							
-					}
-			
-					while ((line = readerError.readLine()) != null) {
-						outputError.append(line + "\n");
-					}
-					
-					int exitVal = process.waitFor();
-					if (exitVal == 0) {
-						System.out.println("Se ha leido correctamente el caso de prueba " + numeroTest);
-						System.out.println("Guardando resultado en una archivo externo...");
-						
-					
-					} else {
-						System.out.println("Se ha producido un ERROR a la hora de leer el caso de prueba " + numeroTest);
-						System.out.println(outputError);
-					}
-					
-					numeroTest++;
-					archivoTest = new File("klee-last/test"+ formatearNumero(numeroTest) + ".ktest");
-				}}
+			    	   outputError = new StringBuilder();
+			    	   readerError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+
+			    	while((line = readerExito.readLine()) != null) {
+			    		  	try {
+			    			   line = line.trim();
+			    			   long x = Long.parseLong(line);
+			    			   contenidoArchivo.append("El resultado de la ejecución del test " + numeroTest + " es " + x);
+			    			   System.out.print("guapo te quiero");
+			    		
+			    		   }catch (Exception e) {
+							System.out.print("guapo");
+			    		   }
+			    	   }
+			/*
+			    	   while((line = readerError.readLine()) != null) {
+			    		   try {
+			    			   line = line.trim();
+			    			   long x = Long.parseLong(line);
+			    			   contenidoArchivo.append("El resultado de la ejecución del test " + numeroTest + " es " + x);
+			    		
+			    		   }catch (Exception e) {
+							// TODO: handle exception
+			    		   }
+					*/
+			    	   
+			    	   numeroTest++;
+			    	   archivoTest = new File("klee-last/test"+ formatearNumero(numeroTest) + ".ktest");
+				
+			       }					       
+			       
+			       System.out.println("Realizado");
+					crearArchivo(contenidoArchivo, "ResultadosEjecucion");
 			}
-			
 			 catch (Exception e) {
 				e.printStackTrace();
 			
@@ -337,6 +349,9 @@ public class Klee {
 		try {
 			File archivo = new File("./" + nombre + ".txt");
 			if(!archivo.exists()) {
+				archivo.createNewFile();
+			} else {
+				archivo.delete();
 				archivo.createNewFile();
 			}
 			FileWriter fw = new FileWriter(archivo);
