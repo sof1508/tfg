@@ -259,19 +259,22 @@ public class Klee {
 		ProcessBuilder processBuilder = new ProcessBuilder();
 		
 		File archivoTest = new File("klee-last/test"+ formatearNumero(numeroTest) + ".ktest");
-		System.out.println("INICIO");
+		System.out.println("Inicio de la validación...");
+		System.out.println("");
 		
 		try {	
 			while(archivoTest.exists()) {
+				System.out.println("Ejecutando el test " + numeroTest);
 				String[] command =
 					{
 							"bash",
 					};
 				
 				process= Runtime.getRuntime().exec(command);
+					
 				
-			       new Thread(new SyncPipe(process.getErrorStream(), System.err)).start();
-			       new Thread(new SyncPipe(process.getInputStream(), System.out)).start();
+			       //new Thread(new SyncPipe(process.getErrorStream(), System.err)).start();
+			      // new Thread(new SyncPipe(process.getInputStream(), System.out)).start();
 			       
 			       PrintWriter stdin = new PrintWriter(process.getOutputStream());
 			       
@@ -280,20 +283,22 @@ public class Klee {
 			    	   stdin.println("echo $?");
 			    	   stdin.close();
 			    	   
-			    	   readerExito = new BufferedReader(new InputStreamReader(process.getInputStream()));
-							
-			    	   outputError = new StringBuilder();
-			    	   readerError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+			    	   
+			    	  
+						readerExito = new BufferedReader(new InputStreamReader(process.getInputStream()));
+				
+						outputError = new StringBuilder();
+						readerError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+			    	   
 
 			    	while((line = readerExito.readLine()) != null) {
 			    		  	try {
-			    			   line = line.trim();
-			    			   long x = Long.parseLong(line);
-			    			   contenidoArchivo.append("El resultado de la ejecución del test " + numeroTest + " es " + x);
-			    			   System.out.print("guapo te quiero");
+			    		  			line = line.trim();
+			    		  			long x = Long.parseLong(line);
+			    		  			contenidoArchivo.append("El resultado de la ejecución del test " + numeroTest + " es " + x + " \n");
 			    		
 			    		   }catch (Exception e) {
-							System.out.print("guapo");
+							
 			    		   }
 			    	   }
 			/*
@@ -313,7 +318,8 @@ public class Klee {
 				
 			       }					       
 			       
-			       System.out.println("Realizado");
+			       System.out.println("COMPLETADO");
+			       System.out.println("Generando fichero....");
 					crearArchivo(contenidoArchivo, "ResultadosEjecucion");
 			}
 			 catch (Exception e) {
